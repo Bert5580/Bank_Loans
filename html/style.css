@@ -1,0 +1,68 @@
+/* Normalize the screen background */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: transparent; /* Ensures transparency for FiveM */
+    color: #333;
+}
+
+/* Hide the loan menu by default */
+#loanMenu {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 300px;
+    text-align: center;
+}
+
+/* Styling for loan options */
+#loanOptions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#loanOptions li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#loanOptions li:hover {
+    background-color: #c0c0c0;
+}
+
+/* Styling for buttons */
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Notification styling */
+#notification {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+}
