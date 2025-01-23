@@ -11,13 +11,13 @@ lua54 'yes'
 -- Client Scripts
 client_scripts {
     'config.lua',
-    'locales/en.lua', -- Localization file for English
+    'locales/en.lua',
     'client.lua'
 }
 
 -- Server Scripts
 server_scripts {
-    '@mysql-async/lib/MySQL.lua', -- MySQL Async for database interaction
+    '@oxmysql/lib/MySQL.lua',
     'config.lua',
     'server.lua'
 }
@@ -26,14 +26,14 @@ server_scripts {
 ui_page 'html/index.html'
 
 files {
-    'html/index.html', -- Main HTML file for the UI
-    'html/style.css',  -- CSS for styling the UI
-    'html/script.js'   -- JS for UI functionality
+    'html/index.html',
+    'html/style.css',
+    'html/script.js'
 }
 
 -- Dependencies
 dependencies {
-    'qb-core', -- Core framework
-    'qb-menu', -- Menu system for interactions
-    'mysql-async' -- Ensure MySQL Async is available for database queries
+    'qb-core',
+    'qb-menu',
+    'oxmysql'
 }
