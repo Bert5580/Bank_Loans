@@ -7,6 +7,8 @@ Config.LoanLocations = {
     vector3(-2957.67, 476.33, 16.2) -- LS-FB Example location (uncomment if needed)
 }
 
+Config.LoanInterestRate = 0.05 -- Default 5% interest rate
+
 -- NPC Spawn Locations
 Config.NPCSpawnLocations = {
     vector4(244.24, 226.03, 106.29, 161.67),  -- LS NPC spawn location with heading
