@@ -1,111 +1,123 @@
-# Bank Loans Script for QB-Core
+# Bank Loans System for QB-Core
 
-This FiveM resource provides a comprehensive bank loan system for servers using QB-Core. Players can take out loans, repay debts, and interact with NPC bankers at designated locations.
-
----
+This project is a FiveM script designed to integrate a loan system into servers running the QB-Core framework. The system allows players to take loans, manage debts, and repay them over time with configurable interest rates.
 
 ## Features
 
-- Loan options with customizable amounts and interest rates.
-- Dynamic debt tracking.
-- Payment deductions from player paychecks.
-- Configurable loan locations and NPCs.
-- Debugging tools for development.
-- Localized support for easy translation.
+- **Loan Options:**
+  - Multiple loan options with predefined amounts and interest rates.
+  - Loans include configurable interest rates.
+- **Debt Management:**
+  - Tracks debt balances and repayment progress.
+  - Repay loans over time, with payments deducted from player paychecks.
+- **NPC Integration:**
+  - NPCs at designated locations to interact with for taking loans.
+- **Blip and Marker Integration:**
+  - Blips and markers for loan locations on the map.
+- **Player Commands:**
+  - `/debit`: View remaining debt.
+  - `/remove_debit [player ID]`: Admin command to clear a player's debt.
+- **Database Integration:**
+  - Tracks loans in the `player_loans` database table.
+- **Debug Mode:**
+  - Configurable debug prints for testing and troubleshooting.
 
----
+## Requirements
+
+- [QB-Core Framework](https://github.com/qbcore-framework/qb-core)
+- [oxmysql](https://github.com/overextended/oxmysql)
+- [qb-menu](https://github.com/qbcore-framework/qb-menu)
 
 ## Installation
 
-1. **Download and Place Resource**:
-   - Place the `Bank_Loans` folder in your FiveM server's `resources` directory.
-
-2. **Add to Server Config**:
-   - Add the following line to your `server.cfg`:
-     ```plaintext
-     ensure Bank_Loans
-     ```
-
-3. **Dependencies**:
-   - Ensure the following resources are installed and running:
-     - `qb-core`
-     - `qb-menu`
-     - `mysql-async`
-
-4. **Database Setup**:
-   - Add a `debit` column to your `players` table in the database:
-     ```sql
-     ALTER TABLE players ADD COLUMN debit DOUBLE DEFAULT 0;
-     ```
-
-5. **Optional: Localized Support**:
-   - Modify `locales/en.lua` to add translations for other languages if required.
-
----
+1. Clone or download this repository.
+2. Add the `BankLoans.sql` file to your database:
+   ```sql
+   source BankLoans.sql;
+   ```
+3. Place the script in your `resources` folder.
+4. Add the resource to your `server.cfg`:
+   ```cfg
+   ensure Bank_Loans
+   ```
 
 ## Configuration
 
-Edit the `config.lua` file to customize the resource settings:
+All configuration options can be found in `config.lua`. The key settings include:
 
-- **Loan Locations**: Specify coordinates for loan markers and NPCs.
-- **NPC Models**: Define NPC models for bankers.
-- **Loan Options**: Configure loan amounts and interest rates.
-- **Debug Mode**: Enable or disable debug messages.
+- **Loan Locations:** Define coordinates for NPCs and loan blips.
+- **NPC Models:** Customize NPC models and spawn locations.
+- **Loan Options:** Configure available loan amounts and interest rates.
+- **Paycheck Interval and Repayment:** Define how often payments are deducted and the percentage deducted.
+- **Notifications:** Customize notification colors and durations.
 
-Example configuration snippet:
+### Example Configuration
 ```lua
-Config = {
-    LoanLocations = {
-        vector3(242.38, 223.88, 106.79),
-        vector3(-102.49, 6464.56, 32.13),
-    },
-    NPCSpawnLocations = {
-        vector4(243.0, 224.0, 106.29, 0.0),
-    },
-    NPCModel = `s_m_m_bankman_01`,
-    LoanOptions = {
-        {amount = 5000, interestRate = 0.02},
-        {amount = 10000, interestRate = 0.03},
-    },
-    Debug = true,
-    CurrencySymbol = "$"
+Config.LoanLocations = {
+    vector3(243.3, 224.77, 107.29),
+    vector3(-111.95, 6469.14, 32.13),
+    vector3(-2957.67, 476.33, 16.2)
+}
+
+Config.NPCSpawnLocations = {
+    vector4(244.24, 226.03, 106.29, 161.67),
+    vector4(-111.16, 6470.01, 31.63, 135.92),
+    vector4(-2961.08, 483.4, 15.7, 90.06)
+}
+
+Config.LoanOptions = {
+    {amount = 5000, interestRate = 0.02},
+    {amount = 10000, interestRate = 0.03},
+    {amount = 20000, interestRate = 0.04},
+    {amount = 50000, interestRate = 0.05}
 }
 ```
 
----
-
 ## Usage
 
-### Player Commands
-- `/debit`: Check remaining debt.
+### Taking a Loan
+1. Approach a loan NPC.
+2. Press `H` (configurable) to interact with the NPC.
+3. Select a loan option from the menu.
 
-### Admin Commands
-- `/remove_debit [playerID]`: Clear all debt for a specified player.
+### Checking Debt
+- Use the `/debit` command to see your remaining debt.
 
----
+### Clearing Debt (Admins Only)
+- Use `/remove_debit [player ID]` to clear a player's debt.
 
-## Development
+## Database Structure
 
-### Debugging
-- Enable debug mode in `config.lua`:
-  ```lua
-  Config.Debug = true
-  ```
-- Debug messages will provide insights into loan interactions, NPC spawning, and database operations.
+### `players` Table
+The `players` table includes a `debit` column to track the total debt for each player:
+```sql
+ALTER TABLE players ADD COLUMN IF NOT EXISTS debit DECIMAL(10,2) DEFAULT 0.00;
+```
 
-### Locales
-- Modify or add translations in `locales/en.lua`.
+### `player_loans` Table
+Tracks detailed loan information:
+```sql
+CREATE TABLE IF NOT EXISTS player_loans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    citizenid VARCHAR(11) NOT NULL,
+    loan_amount DOUBLE NOT NULL,
+    interest_rate DOUBLE NOT NULL,
+    total_debt DOUBLE NOT NULL,
+    amount_paid DOUBLE DEFAULT 0,
+    date_taken DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_payment DATETIME DEFAULT NULL,
+    FOREIGN KEY (citizenid) REFERENCES players(citizenid) ON DELETE CASCADE
+);
+```
 
-### Known Issues
-- Ensure `locales/en.lua` is properly loaded to avoid missing localization errors.
+## Debugging
 
----
-
-## Support
-For assistance, please create an issue on the project repository or contact the development team.
-
----
+Enable `Config.Debug = true` in `config.lua` to view debug prints for events, loan processing, and database interactions.
 
 ## License
-This project is licensed under the MIT License. See `LICENSE` for more details.
 
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
+
+For any issues or questions, feel free to open an issue on the repository or reach out to the development team.
