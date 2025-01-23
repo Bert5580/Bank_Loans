@@ -1,4 +1,4 @@
-# Bank Loans System for QB-Core
+# QB-Core Bank Loans System for QB-Core
 
 This project is a FiveM script designed to integrate a loan system into servers running the QB-Core framework. The system allows players to take loans, manage debts, and repay them over time with configurable interest rates.
 
