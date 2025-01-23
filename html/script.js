@@ -30,6 +30,14 @@ function confirmLoan(option) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(option)
+        }).then(response => {
+            if (!response.ok) {
+                console.error("Error confirming loan:", response.statusText);
+                showNotification("An error occurred while processing your loan. Please try again.");
+            }
+        }).catch(error => {
+            console.error("Network error:", error);
+            showNotification("Unable to connect to the server. Please check your connection.");
         });
         closeMenu();
     }
@@ -39,16 +47,24 @@ function closeMenu() {
     const menu = document.getElementById('loanMenu');
     if (menu) {
         menu.style.display = 'none';
+    } else {
+        console.warn("Loan menu element not found.");
     }
 }
+
+const NOTIFICATION_TIMEOUT = 5000; // Default timeout for notifications
 
 function showNotification(message) {
     const notification = document.getElementById('notification');
     if (notification) {
         notification.textContent = message;
-        notification.style.display = 'block';
+        notification.classList.add('visible');
+        notification.classList.remove('hidden');
         setTimeout(() => {
-            notification.style.display = 'none';
-        }, 5000);
+            notification.classList.add('hidden');
+            notification.classList.remove('visible');
+        }, NOTIFICATION_TIMEOUT);
+    } else {
+        console.warn("Notification element not found.");
     }
 }
