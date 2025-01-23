@@ -40,6 +40,11 @@ body {
     background-color: #c0c0c0;
 }
 
+#loanOptions li:focus {
+    outline: 2px solid #0056b3; /* Focus outline for keyboard navigation */
+    outline-offset: 2px;
+}
+
 /* Styling for buttons */
 button {
     background-color: #007bff;
@@ -54,6 +59,11 @@ button:hover {
     background-color: #0056b3;
 }
 
+button:focus {
+    outline: 2px solid #0056b3; /* Focus outline for keyboard navigation */
+    outline-offset: 2px;
+}
+
 /* Notification styling */
 #notification {
     display: none;
@@ -65,4 +75,36 @@ button:hover {
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
+    transition: opacity 0.3s ease-in-out; /* Smooth fade-in and fade-out */
+}
+
+#notification.hidden {
+    opacity: 0;
+}
+
+#notification.visible {
+    display: block;
+    opacity: 1;
+}
+
+/* Loading Indicator */
+#loadingIndicator {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    #loanMenu {
+        width: 90%; /* Adjust menu width for smaller screens */
+    }
 }
