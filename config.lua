@@ -7,7 +7,19 @@ Config.LoanLocations = {
     vector3(-2957.67, 476.33, 16.2) -- LS-FB Example location (uncomment if needed)
 }
 
+Config.LoanInterestRate = 0.02 -- Default 2% interest rate
+Config.LoanInterestRate = 0.03 -- Default 3% interest rate
+Config.LoanInterestRate = 0.04 -- Default 4% interest rate
 Config.LoanInterestRate = 0.05 -- Default 5% interest rate
+Config.LoanInterestRate = 0.06 -- Default 6% interest rate
+Config.LoanInterestRate = 0.07 -- Default 7% interest rate
+Config.LoanInterestRate = 0.08 -- Default 8% interest rate
+Config.LoanInterestRate = 0.09 -- Default 9% interest rate
+Config.LoanInterestRate = 0.10 -- Default 10% interest rate
+Config.LoanInterestRate = 0.11 -- Default 11% interest rate
+Config.LoanInterestRate = 0.12 -- Default 12% interest rate
+Config.LoanInterestRate = 0.13 -- Default 13% interest rate
+Config.LoanInterestRate = 0.14 -- Default 14% interest rate
 
 -- NPC Spawn Locations
 Config.NPCSpawnLocations = {
