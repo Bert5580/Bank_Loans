@@ -85,14 +85,62 @@ RegisterNetEvent('bankloan:showDebit')
 AddEventHandler('bankloan:showDebit', function(debt)
     if debt > 0 then
         QBCore.Functions.Notify(string.format("Your remaining debt is %s%s.", Config.CurrencySymbol, debt), "primary")
+        DebugPrint(string.format("Player has %s%s remaining debt.", Config.CurrencySymbol, debt))
     else
         QBCore.Functions.Notify("You have no remaining debt.", "success")
+        DebugPrint("Player has fully repaid their debt.")
     end
 end)
 
-RegisterCommand('debit', function()
-    TriggerServerEvent('bankloan:checkDebt') -- Trigger the server to fetch debt
+RegisterNetEvent('bankloan:giveLoan', function(loanAmount)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+
+    if Player then
+        local citizenid = Player.PlayerData.citizenid
+        local interestRate = Config.LoanInterestRate -- Default interest rate from config
+
+        -- Ensure loanAmount is valid
+        if loanAmount and loanAmount > 0 then
+            local totalDebt = loanAmount + (loanAmount * interestRate)
+
+            -- Insert loan details into the database
+            MySQL.Async.execute(
+                [[
+                    INSERT INTO player_loans (citizenid, loan_amount, interest_rate, total_debt, amount_paid)
+                    VALUES (@citizenid, @loan_amount, @interest_rate, @total_debt, 0)
+                ]],
+                {
+                    ['@citizenid'] = citizenid,
+                    ['@loan_amount'] = loanAmount,
+                    ['@interest_rate'] = interestRate,
+                    ['@total_debt'] = totalDebt
+                },
+                function(rowsChanged)
+                    if rowsChanged > 0 then
+                        -- Add money to the player's wallet
+                        Player.Functions.AddMoney('cash', loanAmount)
+                        TriggerClientEvent('QBCore:Notify', src, string.format("You have received a loan of %s%s.", Config.CurrencySymbol, loanAmount), "success")
+                        DebugPrint(string.format("Loan granted: CitizenID=%s, Amount=%s%s, Total Debt=%s%s", citizenid, Config.CurrencySymbol, loanAmount, Config.CurrencySymbol, totalDebt))
+                    else
+                        TriggerClientEvent('QBCore:Notify', src, "An error occurred while processing your loan.", "error")
+                        DebugPrint(string.format("Failed to grant loan for CitizenID=%s", citizenid))
+                    end
+                end
+            )
+        else
+            DebugPrint("Error: Invalid loan amount provided.")
+        end
+    else
+        DebugPrint("Error: Player not found.")
+    end
 end)
+
+-- Register /debit command for the client
+RegisterCommand('debit', function()
+    DebugPrint("Player triggered /debit command.")
+    TriggerServerEvent('bankloan:checkDebt') -- Notify the server to check the player's debt
+end, false) -- `false` means no permission restrictions
 
 RegisterNetEvent('bankloan:displayDebitNotification')
 AddEventHandler('bankloan:displayDebitNotification', function(totalDebt, paidDebt)
@@ -100,8 +148,10 @@ AddEventHandler('bankloan:displayDebitNotification', function(totalDebt, paidDeb
 
     if remainingDebt > 0 then
         QBCore.Functions.Notify(string.format("You have %s%s of %s%s left to pay on your loan.", Config.CurrencySymbol, remainingDebt, Config.CurrencySymbol, totalDebt), "error")
+        DebugPrint(string.format("Player debt status - Total Debt: %s%s, Paid Debt: %s%s, Remaining: %s%s", Config.CurrencySymbol, totalDebt, Config.CurrencySymbol, paidDebt, Config.CurrencySymbol, remainingDebt))
     else
         QBCore.Functions.Notify("Congratulations! You have fully repaid your loan.", "success")
+        DebugPrint("Player has no remaining debt.")
     end
 end)
 
