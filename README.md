@@ -31,7 +31,7 @@ This project is a FiveM script designed to integrate a loan system into servers 
 ## Installation
 
 1. Clone or download this repository.
-2. Add the `BankLoans.sql` file to your database:
+2. Add the `qb-BankLoans.sql` file to your database:
    ```sql
    source BankLoans.sql;
    ```
