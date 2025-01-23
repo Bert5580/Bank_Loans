@@ -72,13 +72,22 @@ end)
 
 RegisterNetEvent('bankloan:confirmLoan')
 AddEventHandler('bankloan:confirmLoan', function(option)
+    -- Validate loan amount before sending to the server
+    local validAmount = false
+    for _, loanOption in pairs(Config.LoanOptions) do
+        if loanOption.amount == option.amount then
+            validAmount = true
+            break
+        end
+    end
+
+    if not validAmount then
+        QBCore.Functions.Notify("Invalid loan amount selected.", "error")
+        return
+    end
+
     QBCore.Functions.Notify(string.format("You selected a loan of %s%s with %s%% interest.", Config.CurrencySymbol, option.amount, option.interestRate * 100), "success")
-
-    local debtRemaining = option.amount + (option.amount * option.interestRate)
-
-    DebugPrint(string.format("Loan confirmed with amount: %s%s, interest rate: %.2f%%, total debt: %s%s", Config.CurrencySymbol, option.amount, option.interestRate * 100, Config.CurrencySymbol, debtRemaining))
-
-    TriggerServerEvent('bankloan:giveLoan', debtRemaining)
+    TriggerServerEvent('bankloan:giveLoan', option.amount)
 end)
 
 RegisterNetEvent('bankloan:showDebit')
