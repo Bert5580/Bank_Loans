@@ -10,6 +10,7 @@ Locales['en'] = {
     ['error_no_funds'] = 'You do not have enough funds to make this payment',
     ['success_payment'] = 'Payment of %s%s made successfully', -- Adds currency symbol
     ['notify_debit_command'] = 'Your remaining debt is: %s%s', -- Adds currency symbol
+	['loan_interest'] = 'Interest rate: %s%%', -- Adds percentage symbol for interest rates
 
     -- NPC Debugging
     ['npc_spawned'] = 'NPC spawned successfully at location: x=%.2f, y=%.2f, z=%.2f, heading=%.2f',
