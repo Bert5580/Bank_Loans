@@ -1,6 +1,6 @@
 # Update Log
 
-## Version 2.1.0 - [January 25, 2025]
+## Version 1.0.3 - [January 25, 2025]
 ### **New Features**
 - Fully integrated ESX Legacy compatibility for the **Bank Loans** system.
 - Added support for multi-language localization with placeholders for future translations (e.g., `Locales.lua`).
