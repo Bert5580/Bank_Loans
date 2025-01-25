@@ -51,7 +51,7 @@ ADD UNIQUE INDEX IF NOT EXISTS idx_identifier (identifier);
 
 ---
 
-## Version 2.0.0 - [October 10, 2024]
+## Version 1.0.3 - [October 10, 2024]
 ### **Initial Features**
 - Introduced the **Bank Loans** system for QBCore framework.
 - Configurable loan options with support for interest rates and credit requirements.
