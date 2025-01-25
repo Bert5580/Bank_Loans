@@ -1,74 +1,65 @@
-Update Log: Bank Loan System for QB-Core
-Version v1.0.2
-Release Date: January, 25th, 2025
+# Update Log
 
-New Features
-Credit System Integration:
+## Version 2.1.0 - [January 25, 2025]
+### **New Features**
+- Fully integrated ESX Legacy compatibility for the **Bank Loans** system.
+- Added support for multi-language localization with placeholders for future translations (e.g., `Locales.lua`).
+- Introduced dynamic loan options configured via `Config.LoanOptions`:
+  - Loans now have distinct amounts, interest rates, and credit requirements.
+  - Users are notified of insufficient credit scores when attempting loans.
+  
+### **Possible Problems To Remove**
+- You May Have To Remove This Line if The Import Fails (Without "--"),-- ALTER TABLE users 
+ADD UNIQUE INDEX IF NOT EXISTS idx_identifier (identifier);
 
-Players now have a credit score that affects loan eligibility.
-Added exports for checking, adding, and removing player credit, enabling integration with other scripts like dealerships.
-Loans have specific credit requirements (requiredCredit) defined in Config.LoanOptions.
-Dynamic Loan Menu:
+### **Improvements**
+- Enhanced debug logging for easier troubleshooting:
+  - Logs for NPC spawning, blip creation, and menu interactions.
+  - Debug messages now include timestamps and severity levels.
+- Optimized NPC spawning:
+  - Added error handling for missing or invalid NPC models.
+  - NPCs now have predefined scenarios (`WORLD_HUMAN_CLIPBOARD`).
+- Simplified blip creation for loan locations with clearer debug logs.
+- Updated `Config.lua` with better documentation for parameters like `CurrencySymbol`, `PaycheckInterval`, and `PaybackPercentage`.
+- Improved `Locales.lua`:
+  - Standardized keys.
+  - Enhanced comments for placeholder strings like `%s` and `%.2f`.
 
-Replaced HTML-based menu system with qb-menu for seamless integration (For Now Will Update).
-Displays available loans based on player credit.
-Loans with insufficient credit are displayed as "Insufficient Credit" and disabled.
-Key Bind & Interaction Improvements:
+### **Bug Fixes**
+- Fixed missing column references (`citizenid` to `identifier`) in SQL queries.
+- Resolved `player_loans` table creation issues:
+  - Corrected foreign key relationships with `users`.
+  - Ensured `loan_amount`, `total_debt`, and `amount_paid` are non-negative.
+- Patched paycheck deduction logic:
+  - Correctly handles partial payments and outstanding loan amounts.
+  - Prevents unnecessary deductions for players with no debt.
+- Added safeguards to prevent crashes due to missing configurations (e.g., `NPCModel` or `LoanLocations`).
 
-Pressing H (default) near a loan location opens the loan menu if conditions are met.
-Debug logs added for easier troubleshooting of key presses and menu functionality.
-Debt Management:
+### **SQL Updates**
+- Updated database schema for compatibility with ESX Legacy:
+  - Added `credit_score` and `debit` columns to the `users` table.
+  - Created `player_loans` table for detailed loan tracking.
+- Included fallback queries to verify table and column existence before execution.
+- Provided example SQL queries for testing loan operations (e.g., repayment, credit score updates).
 
-Added /debit command to show a player's remaining debt.
-Admin-only /remove_debit [player id] command to clear debt for a specific player.
-Automatically deducts 50% of the paycheck towards loan repayment.
-NPC System:
+### **Commands Added**
+- `/debit`: Check remaining debt.
+- `/remove_debit`: Admin-only command to clear a player's debt.
 
-NPCs spawn at configured locations (Config.NPCSpawnLocations) using the Config.NPCModel.
-NPCs are invincible, stationary, and interact with players to offer loans.
-Custom Notifications:
+### **Known Issues**
+- None reported.
 
-Added structured notifications for loan approvals, rejections, and repayments.
-Notifications use the player's configured currency symbol (Config.CurrencySymbol).
-Enhancements
-Secured Server Events:
+---
 
-All server events now validate inputs (e.g., loan amount, interest rate) to prevent abuse via Lua executors.
-Added credit checks to ensure players cannot bypass loan requirements.
-Permission checks implemented for admin commands.
-Improved Debugging:
+## Version 2.0.0 - [October 10, 2024]
+### **Initial Features**
+- Introduced the **Bank Loans** system for QBCore framework.
+- Configurable loan options with support for interest rates and credit requirements.
+- NPC-based loan interaction at predefined locations.
+- Debug mode for logging and troubleshooting.
 
-Added detailed debug messages to client and server logs for every critical action.
-Logs include timestamps and helpful context (e.g., player credit, loan data).
-Database Optimization:
+---
 
-Improved SQL schema:
-Foreign key relationships and indexing for player_loans table.
-Added credit column to players table to track player credit scores.
-Streamlined queries to fetch player loans and update debt.
-Configurable Settings:
-
-Moved hardcoded settings to config.lua, including:
-Loan locations and NPC spawn points.
-Loan amounts, interest rates, and credit requirements.
-Paycheck deduction percentages.
-
-Bug Fixes:
-Resolved SCRIPT ERROR: attempt to call a nil value (global 'DrawText3D').
-Fixed SCRIPT ERROR: Execution of function reference in script host failed for /remove_debit command.
-Corrected Uncaught SyntaxError: Invalid shorthand property initializer in script.js.
-Addressed qb-menu menu not opening issue by validating server-to-client data flow.
-Fixed incorrect loan amount calculations due to improper interest rate validation.
-Resolved key press detection issues when interacting with loan locations.
-Known Issues
-None reported at this time. Please report bugs or issues on GitHub or via Discord.
-
-Future Plans:
-Add support for dynamic interest rates based on player credit.
-Introduce penalties for late payments, affecting credit scores.
-Implement a loan history feature accessible via a command or menu.
-Expand integration with other scripts (e.g., housing and vehicle loans).
-
-Contributors
-[Bert5580]
-Special thanks to the QB-Core community for feedback and testing.
+## Notes
+- Please report any bugs or issues to the development team.
+- Future updates will focus on adding ATM loan repayments and multi-language localization support.
