@@ -1,18 +1,48 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
--- Debug print helper function
+-- Debug print function
 local function DebugPrint(message, level)
     if Config.Debug then
-        local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+        local timestamp = "[" .. math.floor(GetGameTimer() / 1000) .. "s]" -- Fixes `os.date()` issue
         local levels = { info = "[INFO]", warning = "[WARNING]", error = "[ERROR]" }
         local logLevel = levels[level] or "[INFO]"
-        print(string.format("[%s] %s %s", timestamp, logLevel, message))
+        print(string.format("%s %s %s", timestamp, logLevel, message))
     end
 end
 
--- Add loan blips to the map
+-- Add NPCs using qb-target
+local function SetupLoanNPCs()
+    RequestModel(Config.NPCModel)
+    while not HasModelLoaded(Config.NPCModel) do Wait(10) end
+
+    for _, npc in ipairs(Config.NPCSpawnLocations) do
+        local npcEntity = CreatePed(4, Config.NPCModel, npc.x, npc.y, npc.z - 1.0, npc.w, false, true)
+        SetEntityInvincible(npcEntity, true)
+        SetBlockingOfNonTemporaryEvents(npcEntity, true)
+        FreezeEntityPosition(npcEntity, true)
+        TaskStartScenarioInPlace(npcEntity, "WORLD_HUMAN_CLIPBOARD", 0, true)
+
+        exports['qb-target']:AddTargetEntity(npcEntity, {
+            options = {
+                {
+                    type = "client",
+                    event = "bankloan:openLoanMenu",
+                    icon = "fas fa-dollar-sign",
+                    label = "Get a Loan"
+                }
+            },
+            distance = 2.5
+        })
+
+        DebugPrint("NPC spawned at: x=" .. npc.x .. ", y=" .. npc.y .. ", z=" .. npc.z, "info")
+    end
+
+    SetModelAsNoLongerNeeded(Config.NPCModel)
+end
+
+-- Add Loan Blips
 local function AddLoanBlips()
-    for _, coord in pairs(Config.LoanLocations) do
+    for _, coord in ipairs(Config.LoanLocations) do
         local blip = AddBlipForCoord(coord.x, coord.y, coord.z)
         SetBlipSprite(blip, 108)
         SetBlipScale(blip, 1.0)
@@ -24,47 +54,55 @@ local function AddLoanBlips()
     end
 end
 
--- Spawn loan NPCs
-local function SpawnLoanNPCs()
-    RequestModel(Config.NPCModel)
-    while not HasModelLoaded(Config.NPCModel) do Wait(10) end
+-- Open loan menu
+RegisterNetEvent('bankloan:openLoanMenu', function(credit, loans)
+    local menu = {
+        {
+            header = "Bank Loans - Available Credit: $" .. credit,
+            isMenuHeader = true
+        }
+    }
 
-    for _, location in pairs(Config.NPCSpawnLocations) do
-        local npc = CreatePed(4, Config.NPCModel, location.x, location.y, location.z - 1.0, location.w, false, true)
-        if npc and DoesEntityExist(npc) then
-            SetEntityInvincible(npc, true)
-            SetBlockingOfNonTemporaryEvents(npc, true)
-            FreezeEntityPosition(npc, true)
-            TaskStartScenarioInPlace(npc, "WORLD_HUMAN_CLIPBOARD", 0, true)
-        end
+    for _, loan in ipairs(Config.LoanOptions) do
+        table.insert(menu, {
+            header = "$" .. loan.amount .. " Loan",
+            txt = "Interest: " .. (loan.interestRate * 100) .. "% | Required Credit: " .. loan.requiredCredit,
+            params = {
+                event = "bankloan:requestLoan",
+                args = {
+                    amount = loan.amount,
+                    interestRate = loan.interestRate,
+                    requiredCredit = loan.requiredCredit
+                }
+            }
+        })
     end
 
-    SetModelAsNoLongerNeeded(Config.NPCModel)
-end
-
--- Display loan prompt when near NPC
-CreateThread(function()
-    while true do
-        local playerPed = PlayerPedId()
-        local playerCoords = GetEntityCoords(playerPed)
-        local nearNPC = false
-
-        for _, npc in pairs(Config.NPCSpawnLocations) do
-            if #(playerCoords - vector3(npc.x, npc.y, npc.z)) < 2.0 then
-                nearNPC = true
-                QBCore.Functions.DrawText3D(npc.x, npc.y, npc.z + 1.0, "[H] To Get A Loan")
-
-                if IsControlJustReleased(0, 74) then  -- 74 = H key
-                    TriggerServerEvent('bankloan:getCreditAndLoans')
-                end
-            end
-        end
-
-        if not nearNPC then Wait(1000) else Wait(0) end
-    end
+    exports['qb-menu']:openMenu(menu)
 end)
 
--- Pay Loan via Command
+-- Request Loan
+RegisterNetEvent('bankloan:requestLoan', function(data)
+    TriggerServerEvent('bankloan:giveLoan', data.amount, data.interestRate, data.requiredCredit)
+end)
+
+-- Display debt notification
+RegisterNetEvent('bankloan:displayDebitNotification', function(totalDebt, paidDebt)
+    local remainingDebt = totalDebt - paidDebt
+    QBCore.Functions.Notify(string.format("Total Debt: $%.2f | Paid: $%.2f | Remaining: $%.2f", totalDebt, paidDebt, remainingDebt), "primary")
+end)
+
+-- Display credit info
+RegisterNetEvent('bankloan:displayCreditInfo', function(credit)
+    QBCore.Functions.Notify("Your current credit: " .. credit, "primary")
+end)
+
+-- Check debt command
+RegisterCommand('check_debit', function()
+    TriggerServerEvent('bankloan:checkDebt')
+end, false)
+
+-- Pay Loan
 RegisterCommand('pay_loan', function(_, args)
     local paymentAmount = tonumber(args[1]) or 0
     if paymentAmount > 0 then
@@ -74,52 +112,32 @@ RegisterCommand('pay_loan', function(_, args)
     end
 end, false)
 
-RegisterCommand('check_debit', function()
-    TriggerServerEvent('bankloan:checkDebt')
-end, false)
-
--- Open Loan Menu using qb-menu
-RegisterNetEvent('bankloan:openLoanMenu', function(credit, loans)
-    local menuItems = {
-        {
-            header = "Available Credit: " .. credit,
-            isMenuHeader = true
-        }
-    }
-
-    for _, loanOption in ipairs(Config.LoanOptions) do
-        table.insert(menuItems, {
-            header = "$" .. loanOption.amount .. " Loan",
-            txt = "Interest: " .. (loanOption.interestRate * 100) .. "% | Required Credit: " .. loanOption.requiredCredit,
-            params = {
-                event = "bankloan:requestLoan",
-                args = {
-                    amount = loanOption.amount,
-                    interestRate = loanOption.interestRate,
-                    requiredCredit = loanOption.requiredCredit
-                }
-            }
-        })
-    end
-
-    exports['qb-menu']:openMenu(menuItems)
-end)
-
--- Event to Request Loan
-RegisterNetEvent('bankloan:requestLoan', function(data)
-    TriggerServerEvent('bankloan:giveLoan', data.amount, data.interestRate, data.requiredCredit)
-end)
-
--- Display Debt Notification
-RegisterNetEvent('bankloan:displayDebitNotification', function(totalDebt, paidDebt)
-    local remainingDebt = totalDebt - paidDebt
-    QBCore.Functions.Notify(string.format("Total Debt: $%.2f | Paid: $%.2f | Remaining: $%.2f", totalDebt, paidDebt, remainingDebt), "primary")
-end)
-
--- Initialize blips and NPCs on resource start
-AddEventHandler('onClientResourceStart', function(resourceName)
-    if resourceName == GetCurrentResourceName() then
+-- Setup NPCs and blips on resource start
+AddEventHandler('onClientResourceStart', function(resource)
+    if resource == GetCurrentResourceName() then
+        SetupLoanNPCs()
         AddLoanBlips()
-        SpawnLoanNPCs()
+    end
+end)
+
+-- Interaction prompt for those who do not use qb-target
+CreateThread(function()
+    while true do
+        local playerPed = PlayerPedId()
+        local playerCoords = GetEntityCoords(playerPed)
+        local isNearNPC = false
+
+        for _, npc in ipairs(Config.NPCSpawnLocations) do
+            if #(playerCoords - vector3(npc.x, npc.y, npc.z)) < 2.0 then
+                isNearNPC = true
+                QBCore.Functions.DrawText3D(npc.x, npc.y, npc.z + 1.0, "Press [H] to get a loan")
+
+                if IsControlJustReleased(0, 74) then  -- 74 = H key
+                    TriggerServerEvent('bankloan:getCreditAndLoans')
+                end
+            end
+        end
+
+        if not isNearNPC then Wait(1000) else Wait(0) end
     end
 end)
