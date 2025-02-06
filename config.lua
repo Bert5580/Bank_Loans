@@ -59,6 +59,9 @@ Config.Debug = false
 -- Currency Symbol
 Config.CurrencySymbol = "$"
 
+-- Enable/Disable qb-target for interaction
+Config.UseQBTarget = true 
+
 -- Function: Add Loan Blips
 function AddLoanBlips()
     if not Config.LoanLocations or #Config.LoanLocations == 0 then
@@ -80,7 +83,7 @@ function AddLoanBlips()
     end
 end
 
--- Function: Spawn NPCs
+-- Function: Spawn NPCs with qb-target compatibility
 function SpawnLoanNPCs()
     if not Config.NPCSpawnLocations or #Config.NPCSpawnLocations == 0 then
         print("[Error] No NPC spawn locations configured.")
@@ -110,6 +113,21 @@ function SpawnLoanNPCs()
             SetBlockingOfNonTemporaryEvents(npc, true)
             FreezeEntityPosition(npc, true)
             TaskStartScenarioInPlace(npc, "WORLD_HUMAN_CLIPBOARD", 0, true)
+
+            if Config.UseQBTarget then
+                exports['qb-target']:AddTargetEntity(npc, {
+                    options = {
+                        {
+                            type = "client",
+                            event = "bankloan:openLoanMenu",
+                            icon = "fas fa-dollar-sign",
+                            label = "Get a Loan"
+                        }
+                    },
+                    distance = 2.5
+                })
+            end
+
             if Config.Debug then
                 print(string.format("[Debug] NPC spawned at x=%.2f, y=%.2f, z=%.2f, heading=%.2f", location.x, location.y, location.z, location.w))
             end
