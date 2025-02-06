@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Your Name'
 description 'Bank Loan System with QB-Core Integration'
-version '2.1.0'
+version 'Qv1.0.4'
 
 lua54 'yes'
 
