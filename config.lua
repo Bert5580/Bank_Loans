@@ -60,7 +60,7 @@ Config.Debug = false
 Config.CurrencySymbol = "$"
 
 -- Enable/Disable qb-target for interaction
-Config.UseQBTarget = true 
+Config.UseQBTarget = false 
 
 -- Function: Add Loan Blips
 function AddLoanBlips()
