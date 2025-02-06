@@ -15,6 +15,8 @@ The **Bank Loans System** is a fully integrated **loan and credit** system desig
   - Players can visit NPCs to apply for loans.
 - **Dynamic Loan Configurations**
   - Adjustable interest rates, credit requirements, and repayment amounts.
+- **qb-target Compatibility**
+  - Interact with NPCs using qb-target.
 - **Multi-Language Support**
   - Locales available for translations.
 - **Debug Mode**
@@ -27,73 +29,61 @@ To **increase a player's credit** from another script (e.g., after completing a 
 
 ```lua
 TriggerServerEvent('bankloan:addCredit', source, creditAmount)
-```
 
 Example usage in another script:
-```lua
+
+lua
+Copy
+Edit
 RegisterNetEvent('job:bonus')
 AddEventHandler('job:bonus', function()
     local playerId = source
     local creditBonus = 10 -- Increase by 10 points
     TriggerServerEvent('bankloan:updateCredit', playerId, creditBonus, "Job Performance Bonus")
-end)
-```
+end)```
 
----
 
-# 📖 Commands List
+📖 Commands List
+Player Commands:
+Command	Description
+/check_credit	Displays the player's current credit.
+/check_debit	Shows the remaining debt the player needs to repay.
+/pay_loan [amount]	Pays off a specified amount towards the loan.
+/grant_loan [player_id] [amount] [interest]	Grants a loan to a specific player with an interest rate.
+Admin Commands:
+Command	Description
+/addcredit [player_id] [amount]	Adds credit to a player.
+/removecredit [player_id] [amount]	Removes credit from a player.
+/add_debit [player_id] [amount]	Adds a debt amount to a player.
+/remove_debit [player_id] [amount]	Removes a specified debt amount from a player.
+📜 Update Log
 
-### **Player Commands:**
-| Command | Description |
-|---------|-------------|
-| `/check_credit` | Displays the player's current credit. |
-| `/check_debit` | Shows the remaining debt the player needs to repay. |
-| `/pay_loan [amount]` | Pays off a specified amount towards the loan. |
-| `/grant_loan [player_id] [amount] [interest]` | Grants a loan to a specific player with an interest rate. |
+Version Qv1.0.5 - [February 15, 2025]
+New Features:
+qb-target Integration
+Players can now interact with loan NPCs using qb-target.
+Added targeting options for easier access.
+Full Loan Payment Rewards
+Players gain 150 credit when they fully pay off their loans.
+Loan Menu with qb-menu
+Loans are now processed through an interactive menu instead of chat commands.
+Bug Fixes & Improvements:
+Fixed NPCs not spawning correctly at loan locations.
+/pay_loan now properly deducts money and updates remaining debt.
+/check_debit now accurately reflects loan payments.
+Added /add_debit and /remove_debit for better debt management.
+Improved SQL queries for credit and debt tracking.
 
-### **Admin Commands:**
-| Command | Description |
-|---------|-------------|
-| `/addcredit [player_id] [amount]` | Adds credit to a player. |
-| `/removecredit [player_id] [amount]` | Removes credit from a player. |
-| `/add_debit [player_id] [amount]` | Adds a debt amount to a player. |
-| `/remove_debit [player_id] [amount]` | Removes a specified debt amount from a player. |
+Version Qv1.0.4 - [February 10, 2025]
+New Features:
+Added /grant_loan [player_id] [amount] [interest] for admins to issue loans.
+Players gain 150 credit when they fully pay off their loans.
+Bug Fixes & Improvements:
+Improved credit and debit tracking in the database.
+NPC interactions and menus now work consistently.
 
----
-
-# 📜 Update Log
-
-## **Version Qv1.0.4 - [February 10, 2025]**
-### **New Features:**
-- Added `/grant_loan [player_id] [amount] [interest]` for admins to issue loans.
-- `/pay_loan` now **properly deducts money** and updates **remaining debt**.
-- Players **gain 150 credit** when they fully pay off their loans.
-
-### **Bug Fixes & Improvements:**
-- `/check_debit` now **accurately reflects loan payments**.
-- Added `/add_debit` and `/remove_debit` for better debt management.
-- Improved **credit and debit tracking** in the database.
-- **NPC interactions and menus** now work consistently.
-
----
-
-## **Version Qv1.0.3 - [January 25, 2025]**
-### **New Features:**
-- Added **multi-language localization** (`Locales/en.lua`).
-- Configurable loan options (`Config.LoanOptions`).
-- NPC loan interaction system.
-
-### **Bug Fixes:**
-- Fixed missing `citizenid` references in SQL queries.
-- Corrected `player_loans` table creation issues.
-
----
-
-## 🚀 Future Updates
-- **ATM Loan Repayments**.
-- **More Loan Locations**.
-- **Better Interest Rate Calculations**.
-
-### 💡 Need help?
+💡 Need help?
 Join our support community or open an issue!
 
+
+This updated `README.md` includes all recent enhancements, bug fixes, and features while ensuring compatibility with `qb-target` and `qb-menu`. Let me know if you need any additional modifications! 🚀
