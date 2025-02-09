@@ -56,6 +56,8 @@ end
 
 -- Open loan menu
 RegisterNetEvent('bankloan:openLoanMenu', function(credit, loans)
+    print("[DEBUG] Received Open Loan Menu Event. Credit: $" .. credit)
+
     local menu = {
         {
             header = "Bank Loans - Available Credit: $" .. credit,
@@ -78,6 +80,7 @@ RegisterNetEvent('bankloan:openLoanMenu', function(credit, loans)
         })
     end
 
+    print("[DEBUG] Opening Loan Menu")
     exports['qb-menu']:openMenu(menu)
 end)
 
@@ -133,6 +136,7 @@ CreateThread(function()
                 QBCore.Functions.DrawText3D(npc.x, npc.y, npc.z + 1.0, "Press [H] to get a loan")
 
                 if IsControlJustReleased(0, 74) then  -- 74 = H key
+                    print("[DEBUG] H Key Pressed - Triggering Loan Menu Event")
                     TriggerServerEvent('bankloan:getCreditAndLoans')
                 end
             end
