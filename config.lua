@@ -17,6 +17,11 @@ Config.NPCSpawnLocations = {
 -- NPC Model
 Config.NPCModel = `cs_bankman`
 
+-- Loan System Settings
+Config.EnableInterest = true -- If false, loans have no interest.
+Config.MaxLoanAmount = 100000000 -- Maximum loan a player can take.
+Config.MinCreditForLoan = 200  -- Minimum credit required for any loan.
+
 -- Loan Options
 Config.LoanOptions = {
     {amount = 5000, interestRate = 0.02, requiredCredit = 200},
@@ -34,7 +39,8 @@ Config.LoanOptions = {
     {amount = 100000000, interestRate = 0.14, requiredCredit = 1600}
 }
 
--- Paycheck and Loan Repayment
+-- Paycheck & Loan Repayment
+Config.EnableAutoRepayment = true -- If true, loans are deducted automatically from paychecks.
 Config.PaycheckInterval = 600000
 Config.PaybackPercentage = 0.5
 
@@ -47,25 +53,24 @@ Config.Notifications = {
 
 -- Credit System
 Config.CreditSystem = {
-    minCreditForLoan = 200,
     creditGainOnRepayment = 50,
     creditLossOnDefault = 25,
     defaultCredit = 200
 }
 
 -- Debug Mode
-Config.Debug = false
+Config.Debug = true
 
 -- Currency Symbol
 Config.CurrencySymbol = "$"
 
 -- Enable/Disable qb-target for interaction
-Config.UseQBTarget = false 
+Config.UseQBTarget = false
 
 -- Function: Add Loan Blips
 function AddLoanBlips()
     if not Config.LoanLocations or #Config.LoanLocations == 0 then
-        print("[Error] No loan locations configured for blips.")
+        print("[ERROR] No loan locations configured for blips.")
         return
     end
     for _, coord in pairs(Config.LoanLocations) do
@@ -78,7 +83,7 @@ function AddLoanBlips()
         AddTextComponentString("Bank Loans")
         EndTextCommandSetBlipName(blip)
         if Config.Debug then
-            print(string.format("[Debug] Loan blip added at x=%.2f, y=%.2f, z=%.2f", coord.x, coord.y, coord.z))
+            print(string.format("[DEBUG] Loan blip added at x=%.2f, y=%.2f, z=%.2f", coord.x, coord.y, coord.z))
         end
     end
 end
@@ -86,11 +91,11 @@ end
 -- Function: Spawn NPCs with qb-target compatibility
 function SpawnLoanNPCs()
     if not Config.NPCSpawnLocations or #Config.NPCSpawnLocations == 0 then
-        print("[Error] No NPC spawn locations configured.")
+        print("[ERROR] No NPC spawn locations configured.")
         return
     end
     if not Config.NPCModel then
-        print("[Error] NPC model is not defined in the configuration.")
+        print("[ERROR] NPC model is not defined in the configuration.")
         return
     end
     RequestModel(Config.NPCModel)
@@ -99,12 +104,12 @@ function SpawnLoanNPCs()
         Wait(10)
         attempts = attempts + 1
         if attempts > 500 then
-            print("[Error] NPC model failed to load after multiple attempts.")
+            print("[ERROR] NPC model failed to load after multiple attempts.")
             return
         end
     end
     if Config.Debug then
-        print("[Debug] NPC model loaded successfully.")
+        print("[DEBUG] NPC model loaded successfully.")
     end
     for _, location in pairs(Config.NPCSpawnLocations) do
         local npc = CreatePed(4, Config.NPCModel, location.x, location.y, location.z - 1.0, location.w, false, true)
@@ -129,10 +134,10 @@ function SpawnLoanNPCs()
             end
 
             if Config.Debug then
-                print(string.format("[Debug] NPC spawned at x=%.2f, y=%.2f, z=%.2f, heading=%.2f", location.x, location.y, location.z, location.w))
+                print(string.format("[DEBUG] NPC spawned at x=%.2f, y=%.2f, z=%.2f, heading=%.2f", location.x, location.y, location.z, location.w))
             end
         else
-            print(string.format("[Error] Failed to spawn NPC at x=%.2f, y=%.2f, z=%.2f, heading=%.2f", location.x, location.y, location.z, location.w))
+            print(string.format("[ERROR] Failed to spawn NPC at x=%.2f, y=%.2f, z=%.2f, heading=%.2f", location.x, location.y, location.z, location.w))
         end
     end
     SetModelAsNoLongerNeeded(Config.NPCModel)
