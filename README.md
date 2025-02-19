@@ -1,4 +1,4 @@
-# Bank Loans System for QB-Core
+# Bank Loans Qv1.0.7 System for QB-Core
 
 ## 📌 Overview
 The **Bank Loans System** is a fully integrated **loan and credit system** designed for **QB-Core**. It allows players to take loans, repay them through paychecks, and manage their credit.
@@ -37,7 +37,7 @@ The **Credit System** in this script is a numerical score assigned to each playe
 ### 📅 Credit Adjustments
 | Action | Credit Change |
 |--------|--------------|
-| Paying a Loan | +50 Credit |
+| Paying a Loan | +75 Credit |
 | Paying Full Loan | +150 Credit |
 | Missing Payment | -25 Credit |
 | Admin Adjustment | Variable |
@@ -150,6 +150,9 @@ restart server
 ✅ If successful, you’re an admin!
 
 ---
+
+## 🔴🟢 REMOVED TEMPORARY FEATURES
+I have temporarily removed qb-target for now will return soon...
 
 ## 📃 Commands List
 ### 🟢 Player Commands
