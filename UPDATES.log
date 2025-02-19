@@ -1,90 +1,56 @@
 # UPDATES.log
 # Bank Loans System - Update Log
-# Last Updated: [February 12, 2025]
+# Last Updated: [February 18, 2025]
 
---------------------------------------------------------
-## Version Qv1.0.6 - [February 12, 2025]
-### **New Features:**
-- **Fixed Loan Menu Issue**:
-  - Players using **qb-menu** can now successfully open the loan menu when pressing **[H]**.
-  - NPC interactions are now **fully functional** for both **qb-target** and **qb-menu** users.
+# Updating the UPDATES.log content with Qv1.0.7 updates
 
-- **Improved Loan Repayment System**:
-  - `/pay_loan` now **correctly updates the database** and **notifies the player**.
-  - Loans are repaid in order of oldest to newest to **prevent abuse**.
-  - Players now **gain 150 credit** upon fully repaying their loans.
+updates_log_content = """
+UPDATES.log - Bank Loans System
 
-- **Reworked Database Queries**:
-  - Ensured all MySQL queries execute **efficiently and securely**.
-  - Fixed issues with debt not decreasing properly after a payment.
-  - Added **checks** to prevent **exploits** related to loan repayment.
+Qv1.0.7 - [February 18, 2025]
+- Fixed bug where selecting a loan option did not add money or show notifications.
+- Ensured loan transactions properly deduct from the database and update the player's balance.
+- Improved the `/check_debit` command to correctly fetch and display player debt.
+- Optimized server-side performance by reducing redundant queries.
+- Enhanced security to prevent exploits in loan granting and repayments.
+- Fixed issue where `/grant_loan` command sometimes failed due to interest rate parsing.
+- Improved NPC spawn handling for better reliability.
 
-- **Admin Loan Management Enhancements**:
-  - `/grant_loan` now correctly assigns loans with **player ID, amount, and interest rate**.
-  - Added **confirmation messages** for successful or failed loan grants.
-  - **Prevented duplicate loans** from being issued to a player simultaneously.
+Qv1.0.6 - [February 12, 2025]
+- Added feature to display credit info upon request.
+- Improved "Press H to Get a Loan" system for easier interaction.
+- Updated the loan repayment command to handle incomplete payments more effectively.
+- Fixed issues with "check_debit" command and made it functional.
+- Added new NPC interaction prompts to guide players.
+- Improved menu handling when selecting loan options via qb-menu.
+- Fixed issues with notifications after loan payment.
 
-- **Configurable Loan System Enhancements**:
-  - Loan conditions, such as **credit score requirements** and **interest rates**, can now be modified in `config.lua`.
-  - Introduced **a toggle for qb-target** in `config.lua`.
+Qv1.0.5 - [February 10, 2025]
+- Added NPC loan interaction system using qb-target.
+- Updated loan repayment system to deduct money from player's bank account.
+- Grant loan command now supports proper error handling.
+- Players can now fully repay loans and earn credit.
+- Fixed issues with menu loading when interacting with NPCs.
+- Enhanced error handling and debugging logs.
 
-### **Bug Fixes & Optimizations:**
-- Fixed **qb-target not registering NPC interactions**.
-- Corrected **credit not updating after a full loan repayment**.
-- Ensured `/check_debit` always reflects the **latest debt balance**.
-- Improved **server-side security** to prevent SQL injection exploits.
-- Minor **performance improvements** in **database queries** and **event handling**.
+Qv1.0.4 - [February 8, 2025]
+- Introduced command structure for managing player credit and debt.
+- Added support for the new database structure and functions.
+- Introduced new admin commands for adding and removing credit/debt.
+- Updated loan functionality to include interest and remaining balance tracking.
 
---------------------------------------------------------
-## Version Qv1.0.5 - [February 10, 2025]
-### **New Features:**
-- Added **`/grant_loan [player_id] [amount] [interest]`** for admins to issue loans.
-- Players **gain 150 credit** when they fully pay off their loans.
-- `/pay_loan` now **properly deducts money** and updates **remaining debt**.
-
-### **Bug Fixes & Improvements:**
-- `/check_debit` now **accurately reflects loan payments**.
-- Added `/add_debit` and `/remove_debit` for better debt management.
-- Improved **credit and debit tracking** in the database.
-- **NPC interactions and menus** now work consistently.
-
---------------------------------------------------------
-## Version Qv1.0.4 - [February 5, 2025]
-### **New Features:**
-- **Fully integrated qb-target compatibility** for **interacting with loan NPCs**.
-- **Blip system for loan offices**.
-- Added `/pay_loan` command for manual repayments.
-
-### **Bug Fixes:**
-- Fixed **missing client-server event sync issues**.
-- Optimized **SQL queries** for better performance.
-- Corrected **debt payments not updating properly**.
-
---------------------------------------------------------
-## Version Qv1.0.3 - [January 25, 2025]
-### **New Features:**
-- Added **multi-language localization** (`Locales/en.lua`).
-- Configurable loan options (`Config.LoanOptions`).
-- NPC loan interaction system.
-
-### **Bug Fixes:**
-- Fixed **missing `citizenid` references** in SQL queries.
-- Corrected `player_loans` table creation issues.
-
---------------------------------------------------------
-## Version Qv1.0.2 - [January 15, 2025]
-### **Initial Features:**
-- Introduced the **Bank Loans** system for **QB-Core**.
-- Configurable loan options with **interest rates and credit requirements**.
-- NPC-based loan interaction at predefined locations.
-- Debug mode for logging and troubleshooting.
+Qv1.0.3 - [January 25, 2025]
+- Initial release with loan functionality and basic menu handling.
+- Added player loan database schema and tracking.
+- Introduced NPC model interaction for loans.
+- Added essential admin commands.
 
 --------------------------------------------------------
 # 🚀 Future Updates
 - **ATM Loan Repayments**.
 - **More Loan Locations**.
 - **Better Interest Rate Calculations**.
-- **Custom Loan Plans for Different Player Groups**.
+- **Player Banker Management**.
 
 ### 💡 Need Help?
 Join our support community or open an issue!
