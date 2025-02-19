@@ -84,15 +84,15 @@ RegisterNetEvent('bankloan:openLoanMenu', function(credit, loans)
     exports['qb-menu']:openMenu(menu)
 end)
 
+
 -- Request Loan
 RegisterNetEvent('bankloan:requestLoan', function(data)
-    TriggerServerEvent('bankloan:giveLoan', data.amount, data.interestRate, data.requiredCredit)
-end)
-
--- Display debt notification
-RegisterNetEvent('bankloan:displayDebitNotification', function(totalDebt, paidDebt)
-    local remainingDebt = totalDebt - paidDebt
-    QBCore.Functions.Notify(string.format("Total Debt: $%.2f | Paid: $%.2f | Remaining: $%.2f", totalDebt, paidDebt, remainingDebt), "primary")
+    -- ✅ Ensure loan data is properly passed
+    if data.amount and data.interestRate and data.requiredCredit then
+        TriggerServerEvent('bankloan:giveLoan', data.amount, data.interestRate, data.requiredCredit)
+    else
+        QBCore.Functions.Notify("Error: Loan data missing.", "error")
+    end
 end)
 
 -- Display credit info
@@ -101,12 +101,18 @@ RegisterNetEvent('bankloan:displayCreditInfo', function(credit)
 end)
 
 -- Check debt command
-RegisterCommand('check_debit', function()
+RegisterCommand('checkdebit', function()
     TriggerServerEvent('bankloan:checkDebt')
 end, false)
 
+-- Display debt notification
+RegisterNetEvent('bankloan:displayDebitNotification', function(totalDebt, paidDebt)
+    local remainingDebt = totalDebt - paidDebt
+    QBCore.Functions.Notify(string.format("Total Debt: $%.2f | Paid: $%.2f | Remaining: $%.2f", totalDebt, paidDebt, remainingDebt), "primary")
+end)
+
 -- Pay Loan
-RegisterCommand('pay_loan', function(_, args)
+RegisterCommand('payloan', function(_, args)
     local paymentAmount = tonumber(args[1]) or 0
     if paymentAmount > 0 then
         TriggerServerEvent('bankloan:payLoan', paymentAmount)
