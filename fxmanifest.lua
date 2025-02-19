@@ -3,12 +3,12 @@ game 'gta5'
 
 author 'Your Name'
 description 'Bank Loan System with QB-Core Integration'
-version 'Qv1.0.6'
+version 'Qv1.0.7'
 
 lua54 'yes'
 
 shared_scripts {
-    'config.lua' -- Ensures shared config access
+    'config.lua'
 }
 
 client_scripts {
@@ -24,6 +24,6 @@ server_scripts {
 dependencies {
     'qb-core',
     'oxmysql',
-    'qb-menu', -- Ensure qb-menu is required for UI
-    'qb-target' -- Ensure qb-target is used properly for NPC interaction
+    --'qb-menu' -- Ensure qb-menu is required for UI
+    --'qb-target' -- Ensure qb-target is used properly for NPC interaction
 }
