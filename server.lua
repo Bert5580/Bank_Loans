@@ -175,7 +175,7 @@ SecureUpdateCreditDebt('adddebit', 'debit', '+', "Debit added to player.")
 SecureUpdateCreditDebt('removedebit', 'debit', '-', "Debit removed from player.")
 
 -- Check for updates
-local CurrentVersion = "Qv1.0.7"
+local CurrentVersion = "Qv1.0.6"
 local RepoURL = "https://api.github.com/repos/Bert5580/Bank_Loans/releases/latest"
 
 function CheckForUpdates()
@@ -199,6 +199,12 @@ function CheckForUpdates()
         end
     end, "GET", "", { ["User-Agent"] = "Mozilla/5.0" })
 end
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        CheckForUpdates()
+    end
+end)
 
 RegisterNetEvent('bankloan:getCreditAndLoans')
 AddEventHandler('bankloan:getCreditAndLoans', function()
