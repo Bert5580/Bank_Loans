@@ -53,7 +53,7 @@ Config.Notifications = {
 
 -- Credit System
 Config.CreditSystem = {
-    creditGainOnRepayment = 50,
+    creditGainOnRepayment = 75,
     creditLossOnDefault = 25,
     defaultCredit = 200
 }
