@@ -28,6 +28,37 @@ local function LoadPlayerLoans()
     )
 end
 
+RegisterNetEvent('bankloan:checkDebt')
+AddEventHandler('bankloan:checkDebt', function()
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+
+    local citizenid = Player.PlayerData.citizenid
+
+    -- Fetch Player's Debt
+    MySQL.Async.fetchAll(
+        'SELECT IFNULL(SUM(total_debt), 0) AS totalDebt, IFNULL(SUM(amount_paid), 0) AS paidDebt FROM player_loans WHERE citizenid = ?',
+        { citizenid },
+        function(result)
+            if result and #result > 0 then
+                local totalDebt = tonumber(result[1].totalDebt) or 0
+                local paidDebt = tonumber(result[1].paidDebt) or 0
+                local remainingDebt = totalDebt - paidDebt
+
+                -- ✅ Send Data Back to Client
+                TriggerClientEvent('bankloan:displayDebitNotification', src, totalDebt, paidDebt)
+
+                -- ✅ Debugging Output
+                DebugPrint(string.format("[Check Debt] Player: %s | Total Debt: $%s | Paid: $%s | Remaining: $%s", citizenid, totalDebt, paidDebt, remainingDebt), "info")
+
+            else
+                TriggerClientEvent('QBCore:Notify', src, "You have no outstanding loans.", "error")
+            end
+        end
+    )
+end)
+
 AddEventHandler('onResourceStart', function(resourceName)
     if resourceName == GetCurrentResourceName() then
         LoadPlayerLoans()
@@ -35,7 +66,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 end)
 
 -- ✅ Secure Admin Command: Grant Loan
-QBCore.Commands.Add('grant_loan', 'Grant a loan to a player', {
+QBCore.Commands.Add('grantloan', 'Grant a loan to a player', {
     { name = 'id', help = 'Player ID' },
     { name = 'amount', help = 'Loan Amount' },
     { name = 'interest', help = 'Interest Rate (Decimal, e.g., 0.05 for 5%)' }
@@ -140,11 +171,11 @@ end
 
 SecureUpdateCreditDebt('addcredit', 'credit', '+', "Credit added to player.")
 SecureUpdateCreditDebt('removecredit', 'credit', '-', "Credit removed from player.")
-SecureUpdateCreditDebt('add_debit', 'debit', '+', "Debit added to player.")
-SecureUpdateCreditDebt('remove_debit', 'debit', '-', "Debit removed from player.")
+SecureUpdateCreditDebt('adddebit', 'debit', '+', "Debit added to player.")
+SecureUpdateCreditDebt('removedebit', 'debit', '-', "Debit removed from player.")
 
 -- Check for updates
-local CurrentVersion = "Qv1.0.6"
+local CurrentVersion = "Qv1.0.7"
 local RepoURL = "https://api.github.com/repos/Bert5580/Bank_Loans/releases/latest"
 
 function CheckForUpdates()
@@ -186,5 +217,48 @@ AddEventHandler('bankloan:getCreditAndLoans', function()
             print("[DEBUG] Sending Loan Menu to Client. Credit: $" .. credit)
             TriggerClientEvent('bankloan:openLoanMenu', src, credit, loans)
         end)
+    end)
+end)
+
+RegisterNetEvent('bankloan:giveLoan')
+AddEventHandler('bankloan:giveLoan', function(loanAmount, interestRate, requiredCredit)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if not Player then return end
+
+    local citizenid = Player.PlayerData.citizenid
+
+    -- Fetch player's credit score
+    MySQL.Async.fetchScalar('SELECT IFNULL(credit, 0) FROM players WHERE citizenid = ?', { citizenid }, function(credit)
+        if credit < requiredCredit then
+            TriggerClientEvent('QBCore:Notify', src, "You don't have enough credit for this loan.", "error")
+            return
+        end
+
+        -- Deduct required credit
+        local newCredit = credit - requiredCredit
+        MySQL.Async.execute('UPDATE players SET credit = ? WHERE citizenid = ?', { newCredit, citizenid })
+
+        local totalDebt = loanAmount * (1 + interestRate)
+        
+        -- Insert loan into database
+        MySQL.Async.insert(
+            'INSERT INTO player_loans (citizenid, loan_amount, interest_rate, total_debt, amount_paid) VALUES (?, ?, ?, ?, ?)',
+            { citizenid, loanAmount, interestRate, totalDebt, 0 },
+            function(insertId)
+                if insertId then
+                    -- ✅ Give the player money
+                    Player.Functions.AddMoney('bank', loanAmount, "Loan Granted")
+
+                    -- ✅ Notify the player
+                    TriggerClientEvent('QBCore:Notify', src, "Loan granted! Amount: $" .. loanAmount, "success")
+
+                    -- ✅ Debugging Output
+                    DebugPrint(string.format("[Loan Granted] Player: %s | Amount: $%d | Interest: %.2f%% | New Credit: %d", citizenid, loanAmount, interestRate * 100, newCredit), "info")
+                else
+                    TriggerClientEvent('QBCore:Notify', src, "Loan processing failed.", "error")
+                end
+            end
+        )
     end)
 end)
